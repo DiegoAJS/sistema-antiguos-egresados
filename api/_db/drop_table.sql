@@ -1,0 +1,10 @@
+DROP TABLE `pgaeng`.`table_advance`,
+			`pgaeng`.`table_position`, 
+			`pgaeng`.`table_notification`, 
+            `pgaeng`.`table_defense_court`,
+            `pgaeng`.`table_payment_history`,  
+            `pgaeng`.`table_tracing`, 
+            `pgaeng`.`table_tutor_assignment`, 
+            `pgaeng`.`table_student_record`,
+            `pgaeng`.`table_program_version`,
+            `pgaeng`.`table_person`;
