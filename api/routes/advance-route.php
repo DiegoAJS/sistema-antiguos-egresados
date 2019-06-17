@@ -1,12 +1,24 @@
 <?php
 
+  $app->get('/advance/rootall', function() use($app){
+    try {
+      $advance = new AdvanceModel();
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($advance->processList(1)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
   $app->get('/advance/all', function() use($app){
     try {
       $advance = new AdvanceModel();
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($advance->processAdvance(5)));
+      $app->response->body(json_encode($advance->processList(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -25,7 +37,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($advance->processAdvance(1)));
+      $app->response->body(json_encode($advance->processCrud(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -39,7 +51,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($advance->processAdvance(2)));
+      $app->response->body(json_encode($advance->processCrud(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -58,7 +70,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($advance->processAdvance(3)));
+      $app->response->body(json_encode($advance->processCrud(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -73,7 +85,22 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($advance->processAdvance(4)));
+      $app->response->body(json_encode($advance->processCrud(4)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
+  $app->post('/advance/undelete', function() use($app){
+    try {
+      $objDatos = json_decode(file_get_contents("php://input"));
+      $advance = new AdvanceModel(
+        $objDatos->advance_id
+      );
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($advance->processCrud(5)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }

@@ -84,12 +84,14 @@ class StudentRecordModel {
 
   public function processList($option){
     $conex = $this->pdo;
-    $sql = 'call list_table_student_record(?,?)';
+    $sql = 'call list_table_student_record(?,?,?,?)';
     $query = $conex->prepare($sql);
     $query->execute(
       array(
         $option,
-        $this->person_student_id
+        $this->person_student_id,
+        $this->career,
+        $this->career_direction
       )
     );
     

@@ -36,7 +36,7 @@ class TracingModel {
     $this->security = new Security();
   }
 
-  public function processTracing($option = 5){
+  public function processCrud($option){
     $conex = $this->pdo;
     $sql = 'call crud_table_tracing(?,?,?,?,?,?,?)';
     $query = $conex->prepare($sql);
@@ -51,22 +51,17 @@ class TracingModel {
         $this->documents_attached
       )
     );
-    $result = null;
+
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo inserta
 
     if($query->rowCount()!=0){
-      if($option >= 5){
-        $result = $query->fetchAll();
-      }else{
-        $result = $query->fetchObject();
-      }			
-			$status = true;
-			$msg = "Proceso con exito";
+      $result = $query->fetchObject();
+      $status = $result->status;
+      $msg = $result->msg;
     }
-    else{
-      $result = null;
-      $status = false; // no se pudo insertar
-      $msg = "No existen datos";
-    }
+
     return $this->response->send(
       $result,
       $status,
@@ -76,14 +71,36 @@ class TracingModel {
 
   }
 
-  public function SetPersonStudentID($person_student_id=null){
-    $this->person_student_id=$person_student_id;
-  }
+  public function processList($option){
+    $conex = $this->pdo;
+    $sql = 'call list_table_tracing(?,?)';
+    $query = $conex->prepare($sql);
+    $query->execute(
+      array(
+        $option,
+        $this->student_record_id
+      )
+    );
 
-  public function SetPersonTutorID($person_tutor_id=null){
-    $this->person_tutor_id=$person_tutor_id;
-  }
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo insertar
+    
+    if($query->rowCount()!=0){
+      $result = $query->fetchAll(PDO::FETCH_OBJ);
+      $status = true;
+      $msg = "Proceso con exito";
+    }
 
+    return $this->response->send(
+      $result,
+      $status,
+      $msg,
+      []
+    );
+
+  }
+  
   public function SetStudentRecordID($student_record_id=null){
     $this->student_record_id=$student_record_id;
   }

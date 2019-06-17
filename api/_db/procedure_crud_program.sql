@@ -1,9 +1,7 @@
 USE PGAENG;
 
-DROP PROCEDURE `pgaeng`.`crud_table_program`;
-
 DELIMITER $$
-
+DROP PROCEDURE `pgaeng`.`crud_table_program`;
 CREATE PROCEDURE crud_table_program(
     IN _operation INT,								/* operaciones{ 1:create, 2:read, 3:update, 4:delete, 5:find }*/
     IN _program_version_id INT,						/* id program version */
@@ -12,9 +10,7 @@ CREATE PROCEDURE crud_table_program(
     IN _grade VARCHAR(120),							/* Grado de las carreras { licenciaturas o tecnico superior }*/
     IN _cost DECIMAL,								/* costo*/
     IN _startd DATETIME,							/* fecha de comienzo*/
-    IN _finishd DATETIME							/* fecha de culminacion*/
-    )
-
+    IN _finishd DATETIME							/* fecha de culminacion*/ )
 BEGIN
 
  CASE _operation 
@@ -63,12 +59,26 @@ BEGIN
         SELECT TRUE AS "status", "Correcto registro HABILITADO" AS msg;
     ELSE
 		SELECT FALSE AS "status", "Error no existe registro" AS msg;
+    END IF;  
+   /* Last registro version para el grado*/ 
+    WHEN 6 THEN 
+	IF EXISTS(SELECT * from table_program_version WHERE grade=_grade AND state=_state AND deleted IS NULL ORDER BY program_version_id DESC LIMIT 1) THEN
+		SELECT * ,TRUE AS "status", "Correcto Version del actual" AS msg from table_program_version WHERE grade=_grade AND state=_state AND deleted IS NULL ORDER BY program_version_id DESC LIMIT 1;
     END IF;
-    
-	WHEN 6 THEN
+	
+    END CASE;     
+END$$
+
+DELIMITER $$
+DROP PROCEDURE `pgaeng`.`list_table_program`;
+CREATE PROCEDURE list_table_program(
+    IN _operation INT								/* operaciones{ 1:ROOTALL, 2:ALL}*/ )
+BEGIN
+	CASE _operation 	
+	WHEN 1 THEN
 		SELECT * FROM table_program_version;
         
-	WHEN 7 THEN
+	WHEN 2 THEN
 		SELECT * FROM table_program_version WHERE deleted IS NULL;
         
 	END CASE;     

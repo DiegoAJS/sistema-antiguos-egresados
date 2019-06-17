@@ -1,9 +1,7 @@
 USE PGAENG;
 
-DROP PROCEDURE `pgaeng`.`crud_table_payment_history`;
-
 DELIMITER $$
-
+DROP PROCEDURE `pgaeng`.`crud_table_payment_history`;
 CREATE PROCEDURE crud_table_payment_history(
  IN _operation INT,						/* operaciones{ 1:create, 2:read, 3:update, 4:delete, 5:all }*/
  IN _payment_history_id INT,			/* id pago*/
@@ -23,15 +21,16 @@ BEGIN
 	ELSE
 		SELECT FALSE AS "status", "Error ya existe registro" AS msg;
 	END IF;
+    
 	WHEN 2 THEN
-    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id ) THEN
+    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id AND deleted IS NULL ) THEN
 		SELECT *, TRUE AS "status", "Correcto registro LEIDO" AS msg  FROM table_payment_history WHERE payment_history_id=_payment_history_id LIMIT 1;
 	ELSE
 		SELECT FALSE AS "status", "Error no existe registro" AS msg;
 	END IF;
         
 	WHEN 3 THEN 
-    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id AND student_record_id=_student_record_id ) THEN    
+    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id AND student_record_id=_student_record_id AND deleted IS NULL ) THEN    
     UPDATE table_payment_history
         SET student_record_id = _student_record_id, 
 			payment = _payment,
@@ -45,28 +44,54 @@ BEGIN
     END IF;
     
 	WHEN 4 THEN 
-    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id ) THEN    
-		DELETE FROM table_payment_history WHERE payment_history_id=_payment_history_id LIMIT 1;
+    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id AND deleted IS NULL) THEN    
+		UPDATE table_payment_history SET deleted = now() WHERE payment_history_id = _payment_history_id LIMIT 1;
         SELECT TRUE AS "status", "Correcto registro ELIMINADO" AS msg;
 	ELSE
 		SELECT FALSE AS "status", "Error no existe registro" AS msg;
 	END IF;
+    
+    WHEN 5 THEN 
+    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE payment_history_id=_payment_history_id AND deleted IS NOT NULL) THEN    
+		UPDATE table_payment_history SET deleted = NULL WHERE payment_history_id = _payment_history_id LIMIT 1;
+        SELECT TRUE AS "status", "Correcto registro HABILITADO" AS msg;
+	ELSE
+		SELECT FALSE AS "status", "Error no existe registro" AS msg;
+	END IF;
+ END CASE; 
+END$$
+
+
+DELIMITER $$
+DROP PROCEDURE `pgaeng`.`list_table_payment_history`;
+CREATE PROCEDURE list_table_payment_history(
+ IN _operation INT,						/* operaciones{ 1:ROOTALL, 2:ALL, 3:PAGOS}*/
+ IN _student_record_id INT				/* id resgistro del estudiante*/
+ )
+
+BEGIN
+
+ CASE _operation 
+	
+     WHEN 1 THEN
+		SELECT * FROM table_payment_history;
         
-	WHEN 5 THEN
-    IF EXISTS(SELECT payment_history_id FROM table_payment_history WHERE student_record_id=_student_record_id ) THEN
-		SELECT * FROM table_payment_history WHERE student_record_id=_student_record_id;
+	 WHEN 2 THEN
+		SELECT * FROM table_payment_history WHERE deleted IS NULL;
+        
+    /* REGISTRO DE STUDIANTE - PAGOS*/
+	WHEN 3 THEN
+    IF EXISTS(SELECT * FROM table_payment_history WHERE student_record_id=_student_record_id  AND deleted IS NULL) THEN
+		SELECT * FROM table_payment_history WHERE student_record_id=_student_record_id AND deleted IS NULL;
 	END IF;
     
-    WHEN 6 THEN
-		SELECT * FROM table_payment_history;
-	END CASE; 
-    
+ END CASE;     
 END$$
 
 /* Area Test
 call crud_table_payment_history("operacion","id",student_record_id, payment, payment_code,name_bank);
 insertar 
-call crud_table_payment_history(1,null,3, 3400, "435757","Banco Bolivia");
+call crud_table_payment_history(1,null,3, 3400, "439757","Banco Bolivia");
 leer
 call crud_table_payment_history(2,7,null, null, null,null);
 editar

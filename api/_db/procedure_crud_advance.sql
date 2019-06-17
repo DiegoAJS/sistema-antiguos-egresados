@@ -1,11 +1,9 @@
 USE PGAENG;
 
-DROP PROCEDURE `pgaeng`.`crud_table_advance`;
-
 DELIMITER $$
-
+DROP PROCEDURE `pgaeng`.`crud_table_advance`;
 CREATE PROCEDURE crud_table_advance(
- IN _operation INT,					/* operaciones{ 1:create, 2:read, 3:update, 4:delete, 5:all }*/
+ IN _operation INT,					/* operaciones{ 1:create, 2:read, 3:update, 4:delete, 5:undelete }*/
  IN _advance_id INT,				/* id autogenerado*/
  IN _student_record_id INT,			/* id registro de estudiante */
  IN _modality VARCHAR(120),			/* modalidad de titulacion {Proyecto de grado, Trabajo dirigido}*/
@@ -18,19 +16,19 @@ BEGIN
 	WHEN 1 THEN 
 		IF NOT EXISTS (SELECT * FROM table_advance WHERE student_record_id = _student_record_id) THEN
 			INSERT INTO table_advance(student_record_id,modality,document,software) VALUE (_student_record_id,_modality,_document,_software);
-			SELECT advance_id, true AS "status", "Correcto registro CREADO" AS msg FROM table_advance WHERE student_record_id = _student_record_id LIMIT 1; 
+			SELECT advance_id, TRUE AS "status", "Correcto registro CREADO" AS msg FROM table_advance WHERE student_record_id = _student_record_id LIMIT 1; 
 		ELSE
-			SELECT false AS "status", "Error de registro ya existe" AS msg;
+			SELECT FALSE AS "status", "Error de registro ya existe" AS msg;
 		END IF;
 	WHEN 2 THEN
-		IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id) THEN
+		IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id AND deleted IS NULL) THEN
 			SELECT *, true AS "status", "Correcto registro LEIDO" AS msg FROM table_advance WHERE advance_id=_advance_id LIMIT 1;
         ELSE
 			SELECT false AS "status", "Error de registro no existe" AS msg;
         END IF;
 		
 	WHEN 3 THEN 
-    IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id) THEN
+    IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id AND deleted IS NULL) THEN
 		UPDATE table_advance
         SET student_record_id=_student_record_id, 
 			modality=_modality,
@@ -38,23 +36,47 @@ BEGIN
             software=_software,
 			updated = now()
         WHERE advance_id=_advance_id  LIMIT 1;
-        SELECT advance_id, true AS "status", "Correcto registro EDITADO" AS msg FROM table_advance WHERE advance_id=_advance_id  LIMIT 1;  
+        SELECT advance_id, TRUE AS "status", "Correcto registro EDITADO" AS msg FROM table_advance WHERE advance_id=_advance_id AND deleted IS NULL LIMIT 1;  
 	ELSE
 		SELECT FALSE AS "status", "Error de registro no existe" AS msg;
 	END IF;
     
 	WHEN 4 THEN 
-    IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id) THEN
-		DELETE FROM table_advance WHERE advance_id=_advance_id LIMIT 1;  
+    IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id AND deleted IS NULL) THEN
+		UPDATE table_advance SET deleted = now() WHERE advance_id=_advance_id  LIMIT 1;  
         SELECT true AS "status", "Correcto registro ELIMINADO" AS msg;
 	ELSE
 		SELECT FALSE AS "status", "Error de registro no existe" AS msg;
 	END IF;
     
-	WHEN 5 THEN
-		SELECT * FROM table_advance;
-	END CASE; 
+    WHEN 5 THEN 
+    IF EXISTS(SELECT * FROM table_advance WHERE advance_id=_advance_id AND deleted IS NOT NULL) THEN
+		UPDATE table_advance SET deleted = NULL WHERE advance_id=_advance_id  LIMIT 1;  
+        SELECT true AS "status", "Correcto registro HABILITADO" AS msg;
+	ELSE
+		SELECT FALSE AS "status", "Error de registro no existe" AS msg;
+	END IF;
     
+ END CASE; 
+
+END$$
+
+DELIMITER $$
+DROP PROCEDURE `pgaeng`.`list_table_advance`;
+CREATE PROCEDURE list_table_advance(
+ IN _operation INT					/* operaciones{ 1:ROOTALL, 2:ALL}*/)
+
+BEGIN
+
+ CASE _operation 
+ 
+	WHEN 1 THEN 
+		SELECT * FROM table_advance;
+        
+	WHEN 2 THEN
+		SELECT * FROM table_advance WHERE deleted IS NULL;
+        
+ END CASE; 
 END$$
 
 /* Area Test

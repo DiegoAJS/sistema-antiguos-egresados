@@ -33,7 +33,7 @@ class PaymentHistoryModel {
     $this->security = new Security();
   }
 
-  public function processPaymentHistory($option = 5){
+  public function processCrud($option = 5){
     $conex = $this->pdo;
     $sql = 'call crud_table_payment_history(?,?,?,?,?,?)';
     $query = $conex->prepare($sql);
@@ -47,21 +47,15 @@ class PaymentHistoryModel {
         $this->name_bank
       )
     );
+
     $result = null;  // data null
     $msg = "No existen datos";
-    $status = false; // no se pudo 
+    $status = false; // no se pudo inserta
 
     if($query->rowCount()!=0){
-      if($option == 5 || $option == 6 ){
-        $result = $query->fetchAll(PDO::FETCH_OBJ);
-        $status = true;
-        $msg = "Proceso con exito";
-
-      }else{
-        $result = $query->fetchObject();
-        $status = $result->status;
-        $msg = $result->msg;
-      }
+      $result = $query->fetchObject();
+      $status = $result->status;
+      $msg = $result->msg;
     }
     
     return $this->response->send(
@@ -72,6 +66,37 @@ class PaymentHistoryModel {
     );
 
   }
+
+  public function processList($option){
+    $conex = $this->pdo;
+    $sql = 'call list_table_payment_history(?,?)';
+    $query = $conex->prepare($sql);
+    $query->execute(
+      array(
+        $option,
+        $this->student_record_id
+      )
+    );
+    
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo inserta
+
+    if($query->rowCount()!=0){
+      $result = $query->fetchAll(PDO::FETCH_OBJ);
+      $status = true;
+      $msg = "Proceso con exito";
+    }
+    
+    return $this->response->send(
+      $result,
+      $status,
+      $msg,
+      []
+    );
+
+  }
+
 
   public function SetStudentRecordID($student_record_id=null){
       $this->student_record_id=$student_record_id;

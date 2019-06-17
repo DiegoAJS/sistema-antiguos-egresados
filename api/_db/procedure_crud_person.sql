@@ -1,7 +1,8 @@
 USE PGAENG;
 
-DROP PROCEDURE `pgaeng`.`crud_table_person`;
+
 DELIMITER $$
+DROP PROCEDURE `pgaeng`.`crud_table_person`;
 CREATE PROCEDURE crud_table_person(
  IN _operation INT,						/* operaciones{ 1:create, 2:read, 3:update, 4:delete, 5:undelete , 6:login }*/
  IN _person_id INT,						/* id persona */
@@ -86,8 +87,9 @@ BEGIN
 	END CASE; 
 END$$
 
-DROP PROCEDURE `pgaeng`.`list_table_person`;
+
 DELIMITER $$
+DROP PROCEDURE `pgaeng`.`list_table_person`;
 CREATE PROCEDURE list_table_person(
  IN _operation INT,						/* operaciones{ 1:rootall, 2:all, 3:cargos, 4:tutor }*/
  IN _person_id INT						/* id persona */) 
@@ -106,7 +108,7 @@ BEGIN
     /* CARGOS */
     WHEN 3 THEN
 		IF EXISTS(select b.appointment from table_person a INNER JOIN table_position b on a.person_id = b.person_id WHERE b.person_id=_person_id AND a.deleted IS NULL AND b.deleted IS NULL) THEN
-			select b.appointment, b.career_direction from table_person a INNER JOIN table_position b on a.person_id = b.person_id WHERE b.person_id=_person_id;
+			select b.appointment, b.career_direction from table_person a INNER JOIN table_position b on a.person_id = b.person_id WHERE b.person_id=_person_id AND a.deleted IS NULL AND b.deleted IS NULL;
 		END IF;
 	
 	/* TUTOR - ESTUDIANTES*/

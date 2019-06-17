@@ -33,7 +33,7 @@ class TutorAssignmentModel {
     $this->security = new Security();
   }
 
-  public function processTutorAssignment($option = 5){
+  public function processCrud($option){
     $conex = $this->pdo;
     $sql = 'call crud_table_tutor_assignment(?,?,?,?,?,?)';
     $query = $conex->prepare($sql);
@@ -47,22 +47,46 @@ class TutorAssignmentModel {
         $this->finishd
       )
     );
-    $result = null;
+
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo inserta
 
     if($query->rowCount()!=0){
-      if($option == 5){
-        $result = $query->fetchAll();
-      }else{
-        $result = $query->fetchObject();
-      }			
-			$status = true;
-			$msg = "Proceso con exito";
+      $result = $query->fetchObject();
+      $status = $result->status;
+      $msg = $result->msg;
     }
-    else{
-      $result = null;
-      $status = false; // no se pudo insertar
-      $msg = "No existen datos";
+    
+    return $this->response->send(
+      $result,
+      $status,
+      $msg,
+      []
+    );
+
+  }
+
+  public function processList($option){
+    $conex = $this->pdo;
+    $sql = 'call list_table_tutor_assignment(?)';
+    $query = $conex->prepare($sql);
+    $query->execute(
+      array(
+        $option
+      )
+    );
+    
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo inserta
+
+    if($query->rowCount()!=0){
+      $result = $query->fetchAll(PDO::FETCH_OBJ);
+      $status = true;
+      $msg = "Proceso con exito";
     }
+    
     return $this->response->send(
       $result,
       $status,

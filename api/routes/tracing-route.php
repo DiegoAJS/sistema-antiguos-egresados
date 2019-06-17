@@ -1,28 +1,38 @@
 <?php
 
-  $app->get('/tracing/all/student/:id/:record', function($id,$record) use($app){
+  $app->get('/tracing/rootall', function() use($app){
     try {
       $tracing = new TracingModel();
-      $tracing->SetPersonStudentID($id);
-      $tracing->SetStudentRecordID($record);
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(5)));
+      $app->response->body(json_encode($tracing->processList(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
   });
 
-  $app->get('/tracing/all/tutor/:id/:record', function($id,$record) use($app){
+  $app->get('/tracing/all', function() use($app){
     try {
       $tracing = new TracingModel();
-      $tracing->SetPersonTutorID($id);
-      $tracing->SetStudentRecordID($record);
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(6)));
+      $app->response->body(json_encode($tracing->processList(2)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
+  $app->post('/tracing/record', function() use($app){
+    try {
+      $objDatos = json_decode(file_get_contents("php://input"));
+      $tracing = new TracingModel();
+      $tracing->SetStudentRecordID($objDatos->student_record_id);
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($tracing->processList(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -42,7 +52,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(1)));
+      $app->response->body(json_encode($tracing->processCrud(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -56,7 +66,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(2)));
+      $app->response->body(json_encode($tracing->processCrud(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -76,7 +86,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(3)));
+      $app->response->body(json_encode($tracing->processCrud(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -91,10 +101,26 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($tracing->processTracing(4)));
+      $app->response->body(json_encode($tracing->processCrud(4)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
   });
+
+  $app->post('/tracing/undelete', function() use($app){
+    try {
+      $objDatos = json_decode(file_get_contents("php://input"));
+      $tracing = new TracingModel(
+        $objDatos->tracing_id
+      );
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($tracing->processCrud(5)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
 
 ?>

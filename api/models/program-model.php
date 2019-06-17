@@ -39,7 +39,7 @@ class ProgramModel {
     $this->security = new Security();
   }
 
-  public function processProgram($option = 5){
+  public function processCrud($option){
     $conex = $this->pdo;
     $sql = 'call crud_table_program(?,?,?,?,?,?,?,?)';
     $query = $conex->prepare($sql);
@@ -60,17 +60,9 @@ class ProgramModel {
     $status = false; // no se pudo inserta
 
     if($query->rowCount()!=0){
-      if($option == 6 || $option == 7){
-        $result = $query->fetchAll(PDO::FETCH_OBJ);
-        $status = true;
-        $msg = "Proceso con exito";
-      }else{
-        $result = $query->fetchObject();
-        $status = $result->status;
-        $msg = $result->msg;
-      }			
-			$status = true;
-			$msg = "Proceso con exito";
+      $result = $query->fetchObject();
+      $status = $result->status;
+      $msg = $result->msg;
     }
     
     return $this->response->send(
@@ -80,6 +72,42 @@ class ProgramModel {
       []
     );
 
+  }
+
+  public function processList($option){
+    $conex = $this->pdo;
+    $sql = 'call list_table_program(?)';
+    $query = $conex->prepare($sql);
+    $query->execute(
+      array(
+        $option
+      )
+    );
+    $result = null;  // data null
+    $msg = "No existen datos";
+    $status = false; // no se pudo inserta
+
+    if($query->rowCount()!=0){
+      $result = $query->fetchAll(PDO::FETCH_OBJ);
+      $status = true;
+      $msg = "Proceso con exito";
+    }
+    
+    return $this->response->send(
+      $result,
+      $status,
+      $msg,
+      []
+    );
+
+  }
+
+  public function setState($state){
+    $this->state = $state;
+  }
+
+  public function setGrade($grade){
+    $this->grade = $grade;
   }
 
 }

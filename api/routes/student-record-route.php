@@ -6,7 +6,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(6)));
+      $app->response->body(json_encode($studentRecord->processList(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -18,13 +18,13 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(7)));
+      $app->response->body(json_encode($studentRecord->processList(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
   });
 
-  $app->post('/student-record/career-direction', function() use($app){
+  $app->post('/student-record/direction', function() use($app){
     try {
       $objDatos = json_decode(file_get_contents("php://input"));
       $studentRecord = new StudentRecordModel();
@@ -32,36 +32,37 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(8)));
+      $app->response->body(json_encode($studentRecord->processList(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
   });
 
-  $app->post('/student-record/career', function() use($app){
+  $app->post('/student-record/careers', function() use($app){
     try {
       $objDatos = json_decode(file_get_contents("php://input"));
       $studentRecord = new StudentRecordModel();
       $studentRecord->setPersonStudentID($objDatos->person_student_id);      
+      $studentRecord->setCareerDirection($objDatos->career_direction);
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(9)));
+      $app->response->body(json_encode($studentRecord->processList(4)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
   });
 
-  $app->post('/student-record/program-version', function() use($app){
+  $app->post('/student-record/programs', function() use($app){
     try {
       $objDatos = json_decode(file_get_contents("php://input"));
       $studentRecord = new StudentRecordModel();
       $studentRecord->setPersonStudentID($objDatos->person_student_id);      
-      $studentRecord->setCareer($objDatos->career);  
+      $studentRecord->setCareer($objDatos->career);
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(10)));
+      $app->response->body(json_encode($studentRecord->processList(5)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -84,7 +85,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(1)));
+      $app->response->body(json_encode($studentRecord->processCrud(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -98,7 +99,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecordModel->processStudentRecord(2)));
+      $app->response->body(json_encode($studentRecordModel->processCrud(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -120,7 +121,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(3)));
+      $app->response->body(json_encode($studentRecord->processCrud(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -135,7 +136,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(4)));
+      $app->response->body(json_encode($studentRecord->processCrud(4)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -150,7 +151,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($studentRecord->processStudentRecord(5)));
+      $app->response->body(json_encode($studentRecord->processCrud(5)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }

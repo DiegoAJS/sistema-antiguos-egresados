@@ -1,12 +1,24 @@
 <?php
 
+  $app->get('/defense-court/rootall', function() use($app){
+    try {
+      $defenseCourt = new DefenseCourtModel();
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($defenseCourt->processList(1)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
   $app->get('/defense-court/all', function() use($app){
     try {
       $defenseCourt = new DefenseCourtModel();
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($defenseCourt->processDefenseCourt(5)));
+      $app->response->body(json_encode($defenseCourt->processList(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -29,7 +41,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($defenseCourt->processDefenseCourt(1)));
+      $app->response->body(json_encode($defenseCourt->processCrud(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -43,11 +55,11 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($defenseCourt->processDefenseCourt(2)));
+      $app->response->body(json_encode($defenseCourt->processCrud(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
-  });
+  })->conditions(array('id'=>'[0-9]{1,11}'));
 
   $app->post('/defense-court/update', function() use($app){
     try {
@@ -66,7 +78,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($defenseCourt->processDefenseCourt(3)));
+      $app->response->body(json_encode($defenseCourt->processCrud(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -81,7 +93,22 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($defenseCourt->processDefenseCourt(4)));
+      $app->response->body(json_encode($defenseCourt->processCrud(4)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
+  $app->post('/defense-court/undelete', function() use($app){
+    try {
+      $objDatos = json_decode(file_get_contents("php://input"));
+      $defenseCourt = new DefenseCourtModel(
+        $objDatos->defense_court_id
+      );
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($defenseCourt->processCrud(5)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }

@@ -6,7 +6,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(6)));
+      $app->response->body(json_encode($program->processList(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -18,7 +18,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(7)));
+      $app->response->body(json_encode($program->processList(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -40,7 +40,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(1)));
+      $app->response->body(json_encode($program->processCrud(1)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -54,7 +54,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(2)));
+      $app->response->body(json_encode($program->processCrud(2)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -75,7 +75,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(3)));
+      $app->response->body(json_encode($program->processCrud(3)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -90,7 +90,7 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(4)));
+      $app->response->body(json_encode($program->processCrud(4)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }
@@ -105,7 +105,22 @@
       $app->response->headers->set('Content-type','application/json');
       $app->response->headers->set('Access-Control-Allow-Origin','*');
       $app->response->status(200);
-      $app->response->body(json_encode($program->processProgram(5)));
+      $app->response->body(json_encode($program->processCrud(5)));
+    }catch(PDOException $e) {
+      echo 'Error: '.$e->getMessage();
+    }
+  });
+
+  $app->post('/program/last', function() use($app){
+    try {
+      $objDatos = json_decode(file_get_contents("php://input"));
+      $program = new ProgramModel();
+      $program->setState($objDatos->state);
+      $program->setGrade($objDatos->grade);
+      $app->response->headers->set('Content-type','application/json');
+      $app->response->headers->set('Access-Control-Allow-Origin','*');
+      $app->response->status(200);
+      $app->response->body(json_encode($program->processCrud(6)));
     }catch(PDOException $e) {
       echo 'Error: '.$e->getMessage();
     }

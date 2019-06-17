@@ -1,9 +1,7 @@
 USE pgaeng;
 
-DROP PROCEDURE `pgaeng`.`crud_table_position`;
-
 DELIMITER $$
-
+DROP PROCEDURE `pgaeng`.`crud_table_position`;
 CREATE PROCEDURE crud_table_position(
 	IN _operation INT, 					/* operacion a realizar*/
 	IN _position_id INT,				/* id auto generado*/
@@ -11,11 +9,8 @@ CREATE PROCEDURE crud_table_position(
     IN _appointment VARCHAR(120),		/* nombre de roles o asignaciones{Docente,coordinador, adm, root}*/
     IN _profession TEXT,				/* profecion { Ing sistemas, Ing Quimico, etc}*/
 	IN _specialty TEXT,					/* Especialidad { Desarrollo de Software, Network, Inteligencia Artificial, Seguridad de la informacion, Sistemas Integrados, Desarrollo Web, Dispositivos moviles, UX y diseño, Robotica}*/
-    IN _career_direction VARCHAR(120)	/* direccion de carreras */
-)
-
+    IN _career_direction VARCHAR(511)	/* direccion de carreras */)
 BEGIN
-
 CASE _operation 
 	WHEN 1 THEN 
     IF NOT EXISTS( SELECT * FROM table_position WHERE person_id = _person_id AND appointment= _appointment AND career_direction=_career_direction) THEN 
@@ -59,16 +54,34 @@ CASE _operation
         SELECT position_id,true AS "status", "Correcto registro HABILITADO" AS msg FROM table_position WHERE position_id= _position_id LIMIT 1; 
 	ELSE 
 		SELECT false AS "status", "Error de registro NO EXISTE" AS msg;
-	END IF;
-	
-    WHEN 6 THEN		       
-        select a.ci, a.first_name, a.last_name ,b.* from table_person a INNER JOIN table_position b on a.person_id = b.person_id;
-        
-	WHEN 7 THEN 
-		select a.ci, a.first_name, a.last_name ,b.* from table_person a INNER JOIN table_position b on a.person_id = b.person_id WHERE b.deleted IS NULL;
+	END IF;	
 	END CASE; 
     
 END$$
+
+
+DELIMITER $$
+DROP PROCEDURE `pgaeng`.`list_table_position`;
+CREATE PROCEDURE list_table_position(
+	IN _operation INT, 					/* operacion a realizar*/
+    IN _career_direction VARCHAR(511)	/* direccion de carreras */)
+BEGIN
+CASE _operation 	
+	
+    WHEN 1 THEN		       
+        select * from table_position;
+        
+	WHEN 2 THEN
+		select * from table_position WHERE deleted IS NULL;
+        
+	WHEN 3 THEN 
+	IF EXISTS(SELECT * FROM table_position WHERE career_direction=_career_direction AND deleted IS NULL) THEN 
+		SELECT * FROM table_position WHERE career_direction=_career_direction AND deleted IS NULL;
+    END IF;
+
+END CASE; 
+END$$
+
 
 /* test* /
 CALL crud_table_appointment("operacion", "appointment_id","person_id", "appointment", "profession", "specialty", "career_direction");
@@ -81,5 +94,5 @@ CALL crud_table_appointment(3, 1,1, "appointment 2", "profession 2", "specialty 
 /*Eliminar * /
 CALL crud_table_appointment(4, 2,null, null, null, null, null);
 /*lista * /
-CALL crud_table_appointment(5, null,null, null, null, null, null);
+CALL list_table_position(2);
 */
